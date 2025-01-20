@@ -40,8 +40,6 @@ def close_cookies(driver):
     )
     button_cookies.click()
 
-    return button_cookies
-
 
 def load_all_results(driver):
     """
@@ -218,17 +216,38 @@ def preprocess_splits_athlete(df_splits_athlete):
     return df_splits_athlete_pp
 
 
-if __name__ == "__main__":
+def scraping_results(url_results: str, year: int):
+    """
+    General function to srape results of 'L'Etape du Tour' of a given results
+    2 different type of results downloaded, from 'Active Results' website (https://resultscui.active.com):
+        - Global results, with the rank of each athlete, its finish time, and further informations (bib, age, sex)
+        - Detailed results of each athlete, with the different split times
+
+    Example:
+        - Global results from following webpage: https://resultscui.active.com/events/LÉtapeduTourdeFrance2024
+        - Detailed results of athlete 'x' from following webpage: https://resultscui.active.com/participants/46156576?pn=23b943ac226659bfa270f20580da7037483fdfa90701b259d8b0009dbe912e8c
+
+    Args:
+        - URL of the results of considered edition
+        - Year of considered edition
+
+    Returns:
+        - 1 dataframe containing global results (format: 1 row per athlete)
+        - y dataframes (for y finishers), each containing split times of an athlete
+
+    Limitations:
+        - Some split times are not provided (e.g. winner of 2024 edition)
+        - "Fast and dirty" names formatting -> some special characters are still present (e.g. '@'), but it is not very important
+        as we do not care about the identity of athletes here
+    """
+
     ##### RESULTS
     # -------
-
-    ##Set results URL
-    url_results = "https://resultscui.active.com/events/L%C3%89tapeduTourdeFrance2024"
 
     ##Go to results webpage
     driver = init_driver()
     driver.get(url_results)
-    button_cookies = close_cookies(driver)  # close cookies
+    close_cookies(driver)  # close cookies
 
     ##Load all results
     load_all_results(driver)
@@ -242,7 +261,7 @@ if __name__ == "__main__":
 
     ##Save results
     df_results_pp.write_parquet(
-        "/Users/qdouzery/Desktop/enduraw/data/edt-2024_results/df_results_edt-2024.parquet"
+        f"/Users/qdouzery/Desktop/enduraw/data/edt-{year}_results/df_results.parquet"
     )
 
     ##### SPLITS
@@ -251,7 +270,7 @@ if __name__ == "__main__":
     ##Come back to results page as initialization
     driver = init_driver()
     driver.get(url_results)
-    button_cookies = close_cookies(driver)  # close cookies
+    close_cookies(driver)  # close cookies
 
     ##Iterate through athletes
     for r in range(len(df_results_pp)):
@@ -262,7 +281,7 @@ if __name__ == "__main__":
         ##Check we did not have downloaed athlete's detailed results yet
         if not (
             os.path.isfile(
-                f"/Users/qdouzery/Desktop/enduraw/data/edt-2024_results/splits/df_splits_{athlete_name.replace('_', '-')}.parquet"
+                f"/Users/qdouzery/Desktop/enduraw/data/edt-{year}_results/splits/df_splits_{athlete_name.replace('_', '-')}.parquet"
             )
         ):
             ##Download athlete's splits
@@ -275,9 +294,18 @@ if __name__ == "__main__":
 
             ##Save splits
             df_splits_athlete_pp.write_parquet(
-                f"/Users/qdouzery/Desktop/enduraw/data/edt-2024_results/splits/df_splits_{athlete_name.replace('_', '-')}.parquet"
+                f"/Users/qdouzery/Desktop/enduraw/data/edt-{year}_results/splits/df_splits_{athlete_name.replace('_', '-')}.parquet"
             )
             print(f"Splits of {athlete_name} downloaded.")
 
     ##Quit driver
     driver.quit()
+
+
+if __name__ == "__main__":
+    ##Set results URL and year
+    url_results = "https://resultscui.active.com/events/L%C3%89tapeduTourdeFrance2024"
+    year = 2024
+
+    ##Scrape results
+    scraping_results(url_results, year)
