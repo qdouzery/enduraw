@@ -216,7 +216,7 @@ def preprocess_splits_athlete(df_splits_athlete):
     return df_splits_athlete_pp
 
 
-def scraping_results(url_results: str, year: int):
+def scrape_results(url_results: str, year: int):
     """
     General function to srape results of 'L'Etape du Tour' of a given results
     2 different type of results downloaded, from 'Active Results' website (https://resultscui.active.com):
@@ -239,6 +239,7 @@ def scraping_results(url_results: str, year: int):
         - Some split times are not provided (e.g. winner of 2024 edition)
         - "Fast and dirty" names formatting -> some special characters are still present (e.g. '@'), but it is not very important
         as we do not care about the identity of athletes here
+        - Oversight of adding bib to individual splits -> impossible to distinguish athletes with the same name
     """
 
     ##### RESULTS
@@ -308,4 +309,4 @@ if __name__ == "__main__":
     year = 2024
 
     ##Scrape results
-    scraping_results(url_results, year)
+    scrape_results(url_results, year)

@@ -179,4 +179,7 @@ pyrightconfig.json
 # Utils
 /enduraw_src/utils
 
+# Development
+/enduraw_src/edt/development
+
 # End of https://www.toptal.com/developers/gitignore/api/python
