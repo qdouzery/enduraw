@@ -3,8 +3,11 @@
 ## Informations générales
 
 Auteur : Quentin Douzery
+
 Sujet : *L'Étape du Tour 2024*
+
 Source des données : https://resultscui.active.com/events/LÉtapeduTourdeFrance2024
+
 
 Dernière mise à jour : 22/01/2025
 
